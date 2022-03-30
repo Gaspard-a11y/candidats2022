@@ -1,5 +1,6 @@
 import os
 import json
+import random
 
 import fire
 
@@ -17,6 +18,11 @@ def main(candidats='all'):
     print("Vous devrez attribuer deux notes à 20 mesures par candidat :")
     print("Note 1 : mesure inutile : 0 , ... , 5 : mesure indispensable")
     print("Note 2 : pas du tout d'accord : -5 , ... , 5 : complètement d'accord")
+    print("\n")
+    name = input("Votre nom : ")
+    print("\n")
+    input("Appuyer sur Entrée pour commencer.")
+    print("\n")
 
     programme_paths = [os.path.join(programmes_folder, programmes_files)
                        for programmes_files in os.listdir(programmes_folder)]
@@ -27,17 +33,20 @@ def main(candidats='all'):
         dico = load_json(programme_path)
         for proposition in dico["propositions"]:
             propositions_dico[proposition] = dico["name"]
- 
     num_propositions = len(propositions_dico)
+
+    # Shuffle the propositions
+    proposition_keys = list(propositions_dico)
+    random.shuffle(proposition_keys)
 
     # Ask the questions
     # FIXME overkill
     score_by_candidate = {propositions_dico[proposition] : 0 for proposition in propositions_dico.keys()}
 
-    # TODO randomize
-    for i, proposition in enumerate(list(propositions_dico.keys())):
+    for i, proposition in enumerate(proposition_keys):
         print(f"-------------------- Proposition {i} sur {num_propositions} --------------------")
         print(proposition)
+        print("\n")
         candidate_name = propositions_dico[proposition]
         importance = input("Importance de la mesure (mesure inutile : 0 , ... , 5 : mesure indispensable) : ")
         accord = input("Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ")
@@ -48,7 +57,7 @@ def main(candidats='all'):
     # Print results
     print("\n")
     print("---------------------------------- Résultats ----------------------------------")
-    print("Voici vos scores par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord)")
+    print(f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord)")
     print("\n")
 
     for candidate_name in list(score_by_candidate.keys()):
