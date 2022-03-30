@@ -65,6 +65,9 @@ def main(candidats='all'):
         print(f"score : {score_by_candidate[candidate_name]/20}")
         print("\n")
    
+    # TODO allow saving the results in a e.g. txt file
+    # TODO add matplotlib dependency and save a plot
+
     return
 
 
