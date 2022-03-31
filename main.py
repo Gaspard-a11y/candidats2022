@@ -142,7 +142,7 @@ def main():
     sorted_scores.sort(reverse=True, key = lambda x: x[1])
     for name_score in sorted_scores:
         candidate_name, score = name_score
-        print(f"{candidate_name} : {score}")
+        print(f"{candidate_name} : {round(score,2)}")
     print("\n")
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
