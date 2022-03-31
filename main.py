@@ -33,6 +33,18 @@ def split_selection_candidats(string, candidats):
         return valid_input, selected_nicknames
 
 
+def input_float(prompt):
+    """
+    Input a float number in str format.
+    Empty float results in 0.
+    """
+    string = input(prompt)
+    if len(string)==0:
+        return 0.
+    else:
+        return float(string)
+
+
 def main():
     """
     Main script, ask the selection of candidates, ask the questions and print results.
@@ -101,13 +113,13 @@ def main():
 
     for i, proposition in enumerate(proposition_keys):
         print(
-            f"-------------------- Proposition {i} sur {num_propositions} --------------------")
+            f"-------------------- Proposition {i+1} sur {num_propositions} --------------------")
         print(proposition)
         print("\n")
         candidate_name = propositions_dico[proposition]
-        importance = input(
+        importance = input_float(
             "Importance de la mesure (mesure inutile : 0 , ... , 5 : mesure indispensable) : ")
-        accord = input(
+        accord = input_float(
             "Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ")
         score = float(importance)*float(accord)/25
         score_by_candidate[candidate_name] += score
@@ -120,16 +132,9 @@ def main():
         f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord)")
     print("\n")
 
-    for candidate_name in list(score_by_candidate.keys()):
-        print(f"Candidat : {candidate_name}")
-        print(f"score : {score_by_candidate[candidate_name]/20}")
-        print("\n")
-
     for candidat in selected_candidats:
         candidate_name = candidat.name
-        print(f"Candidat : {candidate_name}")
-        print(f"Average proposition score : {score_by_candidate[candidate_name]/candidat.num_propositions}")
-        print("\n")
+        print(f"Candidat : {candidate_name}, score moyen : {score_by_candidate[candidate_name]/candidat.num_propositions}")
 
 
     # TODO allow saving the results in a e.g. txt file
