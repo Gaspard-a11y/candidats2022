@@ -56,9 +56,8 @@ def main():
     # Intro
     print("---------------------------------------- Candidats 2022  ----------------------------------------\n")
     print("                        Bienvenue dans cette aide à la décision politique. \n")
-    print("Vous devrez attribuer deux notes à chaque mesure des candidats choisis :")
-    print("Note 1 : mesure inutile : 0 , ... , 5 : mesure indispensable")
-    print("Note 2 : pas du tout d'accord : -5 , ... , 5 : complètement d'accord")
+    print("Vous devrez attribuer une note à chaque mesure des candidats choisis :")
+    print("-5 = complètement en désaccord, ... , 0 = Indifférent , ... , 5 : complètement d'accord")
     print("\n")
 
     name = input("Votre nom : ")
@@ -89,7 +88,7 @@ def main():
 
     print("Les candidats choisis sont :")
     for candidat in selected_candidats:
-        print(f"{candidat.name},")
+        print(f"{candidat.name}")
     print("\n")
 
     input("Appuyer sur Entrée pour commencer.")
@@ -117,15 +116,13 @@ def main():
         print(proposition)
         print("\n")
         candidate_name = propositions_dico[proposition]
-        importance = input_float(
-            "Importance de la mesure (mesure inutile : 0 , ... , 5 : mesure indispensable) : ")
         accord = input_float(
             "Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ")
-        score = float(importance)*float(accord)/25
+        score = float(accord)/5
         score_by_candidate[candidate_name] += score
         print("\n")
 
-    print("Félicitation, vous avez terminé !")
+    print("---------------------------------------- C'est terminé !  ----------------------------------------\n")
     input("Appuyez sur Entrée pour voir vos résultats")
 
     # Print results
