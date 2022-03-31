@@ -47,7 +47,7 @@ def input_float(prompt):
         return float(string)
 
 
-def main(output_dir = u'.\resultats'):
+def main(output_dir = './resultats'):
     """
     Main script, ask the selection of candidates, ask the questions and print results.
     """
@@ -144,10 +144,10 @@ def main(output_dir = u'.\resultats'):
         print(f"{candidate_name} : {round(score,2)}")
     print("\n")
 
-#    output_path = output_dir + '\' + name + '.json'
-#    json_object = json.dumps(score_by_candidate, indent = 4)
-#    with open(output_path, "w") as outfile:
-#        outfile.write(json_object)
+    output_path = output_dir + '/' + name + '.json'
+    json_object = json.dumps(score_by_candidate, ensure_ascii=False, indent = 4).encode("utf8")
+    with open(output_path, "w") as outfile:
+        outfile.write(json_object) # FIXME
     
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
