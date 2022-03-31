@@ -2,6 +2,7 @@ import os
 import random
 
 import fire
+from tqdm import tqdm
 
 from candidat import Candidat
 
@@ -110,9 +111,8 @@ def main():
     score_by_candidate = {
         candidat.name : 0. for candidat in selected_candidats}
 
-    for i, proposition in enumerate(proposition_keys):
-        print(
-            f"-------------------- Proposition {i+1} sur {num_propositions} --------------------")
+    for proposition in tqdm(proposition_keys, desc="Progression"):
+        print("--------------------------------------------------------------------------------------------------")
         print(proposition)
         print("\n")
         candidate_name = propositions_dico[proposition]
@@ -122,6 +122,7 @@ def main():
         score_by_candidate[candidate_name] += score
         print("\n")
 
+    print("\n")
     print("---------------------------------------- C'est terminé !  ----------------------------------------\n")
     input("Appuyez sur Entrée pour voir vos résultats")
 
@@ -142,7 +143,7 @@ def main():
     for name_score in sorted_scores:
         candidate_name, score = name_score
         print(f"{candidate_name} : {score}")
-
+    print("\n")
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
 
