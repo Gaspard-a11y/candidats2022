@@ -132,11 +132,16 @@ def main():
         f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :")
     print("\n")
 
-    # TODO print results in descending order of score
+    # Average out each score
     for candidat in selected_candidats:
-        candidate_name = candidat.name
-        print(f"{candidate_name} : {score_by_candidate[candidate_name]/candidat.num_propositions}")
+        score_by_candidate[candidat.name] /= candidat.num_propositions
 
+    # Print the results in descending order
+    sorted_scores = list(score_by_candidate.items())
+    sorted_scores.sort(reverse=True, key = lambda x: x[1])
+    for name_score in sorted_scores:
+        candidate_name, score = name_score
+        print(f"{candidate_name} : {score}")
 
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
