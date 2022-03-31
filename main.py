@@ -1,38 +1,94 @@
 import os
-import json
 import random
 
 import fire
 
-programmes_folder = '.\candidats'
+from candidat import Candidat
 
 
-def load_json(json_path):
-    return json.load(open(json_path, "rb"), encoding="utf-8")
+def load_candidats(programmes_folder = '.\candidats'):
+    programme_paths = [os.path.join(programmes_folder, programmes_files)
+            for programmes_files in os.listdir(programmes_folder)]
+    candidats = [Candidat(programme_path) for programme_path in programme_paths]
+    return candidats
 
 
-def main(candidats='all'):
-    # TODO allow selection of candidates
+def split_selection_candidats(string, candidats):
+    """
+    Split the input string into a list of candidats' nicknames, return the list.
+    Return whether the input is valid.
+    Input string : e.g. 'ma-me-ro'
+    Input candidats = list of Candidat objects.
+    """
+    candidats_nicknames = [candidat.nickname for candidat in candidats]
+    if len(string)==0:
+        valid_input = True
+        return valid_input, candidats_nicknames
+    else :
+        valid_input = True
+        selected_nicknames = string.lower().split('-')
+        # Check that all nicknames are registered
+        for selected_nickname in selected_nicknames:
+            valid_input &= (selected_nickname in candidats_nicknames)
+        return valid_input, selected_nicknames
+
+
+def main():
+    """
+    Main script, ask the selection of candidates, ask the questions and print results.
+    """
+
+    # Load candidates' profiles
+    candidats = load_candidats()
+
+    # Intro
     print("---------------------------------------- Candidats 2022  ----------------------------------------\n")
     print("                        Bienvenue dans cette aide à la décision politique. \n")
-    print("Vous devrez attribuer deux notes à 20 mesures par candidat :")
+    print("Vous devrez attribuer deux notes à chaque mesure des candidats choisis :")
     print("Note 1 : mesure inutile : 0 , ... , 5 : mesure indispensable")
     print("Note 2 : pas du tout d'accord : -5 , ... , 5 : complètement d'accord")
     print("\n")
+
     name = input("Votre nom : ")
     print("\n")
+    
+    # Candidates selection
+    print("Veuillez choisir les candidats desquels vous voulez juger les propositions,")
+    print("sous la forme d'une chaîne de caractères des diminutifs des candidats, séparés par '-'.")
+    print("\n")
+
+    print("Exemple : 'ma-me-ro' pour Macron, Méenchon, Roussel).")
+    print("Pour juger les programmes de tous les candidats, appuyez sur Entrée.")
+    print("\n")
+
+    print("Diminutif des candidats :")
+    for candidat in candidats:
+        print(f"{candidat.name} : {candidat.nickname}")
+    print("\n")
+
+    valid_input = False
+    while not valid_input:
+        selection_candidats = input("Choix des candidats : ")
+        valid_input, selected_candidats_nicknames = split_selection_candidats(selection_candidats, candidats)
+
+    # Filter the candidats list based on selection
+    selected_candidats = [candidat for candidat in candidats if candidat.nickname in selected_candidats_nicknames]
+    print("\n")
+
+    print("Les candidats choisis sont :")
+    for candidat in selected_candidats:
+        print(f"{candidat.name},")
+    print("\n")
+
     input("Appuyer sur Entrée pour commencer.")
     print("\n")
 
-    programme_paths = [os.path.join(programmes_folder, programmes_files)
-                       for programmes_files in os.listdir(programmes_folder)]
 
     # Build dict str proposition -> str candidate name
     propositions_dico = {}
-    for programme_path in programme_paths:
-        dico = load_json(programme_path)
-        for proposition in dico["propositions"]:
-            propositions_dico[proposition] = dico["name"]
+    for candidat in selected_candidats:
+        for proposition in candidat.propositions:
+            propositions_dico[proposition] = candidat.name
     num_propositions = len(propositions_dico)
 
     # Shuffle the propositions
@@ -40,9 +96,8 @@ def main(candidats='all'):
     random.shuffle(proposition_keys)
 
     # Ask the questions
-    # FIXME overkill
     score_by_candidate = {
-        propositions_dico[proposition]: 0 for proposition in propositions_dico.keys()}
+        candidat.name : 0. for candidat in selected_candidats}
 
     for i, proposition in enumerate(proposition_keys):
         print(
@@ -69,6 +124,13 @@ def main(candidats='all'):
         print(f"Candidat : {candidate_name}")
         print(f"score : {score_by_candidate[candidate_name]/20}")
         print("\n")
+
+    for candidat in selected_candidats:
+        candidate_name = candidat.name
+        print(f"Candidat : {candidate_name}")
+        print(f"Average proposition score : {score_by_candidate[candidate_name]/candidat.num_propositions}")
+        print("\n")
+
 
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
