@@ -125,16 +125,20 @@ def main():
         score_by_candidate[candidate_name] += score
         print("\n")
 
+    print("Félicitation, vous avez terminé !")
+    input("Appuyez sur Entrée pour voir vos résultats")
+
     # Print results
     print("\n")
     print("---------------------------------- Résultats ----------------------------------")
     print(
-        f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord)")
+        f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :")
     print("\n")
 
+    # TODO print results in descending order of score
     for candidat in selected_candidats:
         candidate_name = candidat.name
-        print(f"Candidat : {candidate_name}, score moyen : {score_by_candidate[candidate_name]/candidat.num_propositions}")
+        print(f"{candidate_name} : {score_by_candidate[candidate_name]/candidat.num_propositions}")
 
 
     # TODO allow saving the results in a e.g. txt file
