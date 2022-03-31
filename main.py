@@ -1,4 +1,5 @@
 import os
+import json
 import random
 
 import fire
@@ -7,9 +8,9 @@ from tqdm import tqdm
 from candidat import Candidat
 
 
-def load_candidats(programmes_folder = '.\candidats'):
-    programme_paths = [os.path.join(programmes_folder, programmes_files)
-            for programmes_files in os.listdir(programmes_folder)]
+def load_candidats(programmes_dir = '.\candidats'):
+    programme_paths = [os.path.join(programmes_dir, programmes_files)
+            for programmes_files in os.listdir(programmes_dir)]
     candidats = [Candidat(programme_path) for programme_path in programme_paths]
     return candidats
 
@@ -46,7 +47,7 @@ def input_float(prompt):
         return float(string)
 
 
-def main():
+def main(output_dir = u'.\resultats'):
     """
     Main script, ask the selection of candidates, ask the questions and print results.
     """
@@ -61,7 +62,7 @@ def main():
     print("-5 = complètement en désaccord, ... , 0 = Indifférent , ... , 5 : complètement d'accord")
     print("\n")
 
-    name = input("Votre nom : ")
+    name = input("Votre prénom : ")
     print("\n")
     
     # Candidates selection
@@ -73,10 +74,9 @@ def main():
     print("Pour juger les programmes de tous les candidats, appuyez sur Entrée.")
     print("\n")
 
-    print("Diminutif des candidats :")
-    for candidat in candidats:
-        print(f"{candidat.name} : {candidat.nickname}")
-    print("\n")
+    names_and_nicknames = [f"{candidat.name} : {candidat.nickname}" for candidat in candidats]
+    prompt = '\n'.join(names_and_nicknames)
+    print(f"Diminutif des candidats :\n{prompt}\n")
 
     valid_input = False
     while not valid_input:
@@ -87,10 +87,9 @@ def main():
     selected_candidats = [candidat for candidat in candidats if candidat.nickname in selected_candidats_nicknames]
     print("\n")
 
-    print("Les candidats choisis sont :")
-    for candidat in selected_candidats:
-        print(f"{candidat.name}")
-    print("\n")
+    selected_names = [f"{candidat.name}" for candidat in selected_candidats]
+    prompt = '\n'.join(selected_names)
+    print(f"Les candidats choisis sont :\n{prompt}\n")
 
     input("Appuyer sur Entrée pour commencer.")
     print("\n")
@@ -144,6 +143,12 @@ def main():
         candidate_name, score = name_score
         print(f"{candidate_name} : {round(score,2)}")
     print("\n")
+
+#    output_path = output_dir + '\' + name + '.json'
+#    json_object = json.dumps(score_by_candidate, indent = 4)
+#    with open(output_path, "w") as outfile:
+#        outfile.write(json_object)
+    
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
 
