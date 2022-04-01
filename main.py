@@ -35,7 +35,7 @@ def split_selection_candidats(string, candidats):
         return valid_input, selected_nicknames
 
 
-def input_float(prompt):
+def input_float(prompt): # TODO add min & max
     """
     Input a float number in str format.
     Empty float results in 0.
@@ -45,6 +45,12 @@ def input_float(prompt):
         return 0.
     else:
         return float(string)
+
+
+def save_object_into_json(item, output_path):
+    with open(output_path, 'w', encoding='utf8') as json_file:
+        json.dump(item, json_file, ensure_ascii=False, indent=4)
+    return
 
 
 def main(output_dir = './resultats'):
@@ -64,14 +70,28 @@ def main(output_dir = './resultats'):
 
     name = input("Votre prénom : ")
     print("\n")
-    
+
+    # Check if there already are results
+    output_path = output_dir + '/' + name + '.json'
+    if os.path.exists(output_path):
+        reuse_input = input("Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ").lower()
+        if reuse_input=='y' or reuse_input=='yes' or reuse_input=='o' or reuse_input=='oui':
+            reuse_input = True
+        elif reuse_input=='n' or reuse_input=='no' or reuse_input=='non':
+            reuse_input = False
+        else :
+            reuse_input = True
+
     # Candidates selection
+    print("\n")
     print("Veuillez choisir les candidats desquels vous voulez juger les propositions,")
     print("sous la forme d'une chaîne de caractères des diminutifs des candidats, séparés par '-'.")
     print("\n")
 
     print("Exemple : 'ma-me-ro' pour Macron, Méenchon, Roussel).")
     print("Pour juger les programmes de tous les candidats, appuyez sur Entrée.")
+    if reuse_input:
+        print("Si vous notez à nouveau un candidat, son score précédent sera écrasé.")
     print("\n")
 
     names_and_nicknames = [f"{candidat.name} : {candidat.nickname}" for candidat in candidats]
@@ -82,17 +102,17 @@ def main(output_dir = './resultats'):
     while not valid_input:
         selection_candidats = input("Choix des candidats : ")
         valid_input, selected_candidats_nicknames = split_selection_candidats(selection_candidats, candidats)
+        if not valid_input:
+            print("Sélection incorrecte, veuillez réessayer.")
 
     # Filter the candidats list based on selection
     selected_candidats = [candidat for candidat in candidats if candidat.nickname in selected_candidats_nicknames]
-    print("\n")
 
     selected_names = [f"{candidat.name}" for candidat in selected_candidats]
     prompt = '\n'.join(selected_names)
     print(f"Les candidats choisis sont :\n{prompt}\n")
 
-    input("Appuyer sur Entrée pour commencer.")
-    print("\n")
+    input("Appuyer sur Entrée pour commencer.\n")
 
 
     # Build dict str proposition -> str candidate name
@@ -121,8 +141,7 @@ def main(output_dir = './resultats'):
         score_by_candidate[candidate_name] += score
         print("\n")
 
-    print("\n")
-    print("---------------------------------------- C'est terminé !  ----------------------------------------\n")
+    print("\n---------------------------------------- C'est terminé !  ----------------------------------------\n")
     input("Appuyez sur Entrée pour voir vos résultats.")
 
     # Print results
@@ -142,13 +161,9 @@ def main(output_dir = './resultats'):
     print("\n")
 
     # Save the results in a json file
-    output_path = output_dir + '/' + name + '.json'
-    with open(output_path, 'w', encoding='utf8') as json_file:
-        json.dump(score_by_candidate, json_file, ensure_ascii=False, indent=4)
+    save_object_into_json(score_by_candidate, output_path)
     print(f"Résultats sauvegardés à : {output_path}\n")
 
-
-    # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
 
     return
