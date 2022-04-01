@@ -90,12 +90,11 @@ def main(output_dir='./resultats'):
     print("\n")
 
     name = input("Votre prénom : ")
-    print("\n")
 
     # Check if there already are results
     output_path = output_dir + '/' + name + '.json'
     output_path_png = output_dir + '/' + name + '.png'
-    
+
     if os.path.exists(output_path):
         reuse_input = input(
             "Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ").lower()
@@ -105,6 +104,8 @@ def main(output_dir='./resultats'):
             reuse_input = False
         else:
             reuse_input = True
+    else:
+        reuse_input = False
 
     # Candidates selection
     print("\n")
