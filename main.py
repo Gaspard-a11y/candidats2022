@@ -114,22 +114,27 @@ def main(output_dir = './resultats'):
 
     input("Appuyer sur Entrée pour commencer.\n")
 
-
     # Build dict str proposition -> str candidate name
     propositions_dico = {}
     for candidat in selected_candidats:
         for proposition in candidat.propositions:
             propositions_dico[proposition] = candidat.name
-    num_propositions = len(propositions_dico)
 
     # Shuffle the propositions
     proposition_keys = list(propositions_dico)
     random.shuffle(proposition_keys)
 
-    # Ask the questions
-    score_by_candidate = {
-        candidat.name : 0. for candidat in selected_candidats}
+    # Initialize scores
+    if reuse_input:
+        # Read the previous json file
+        score_by_candidate = json.load(open(output_path, "rb"), encoding="utf-8")
+        # Re-initialize the scores of the selected candidates
+        for candidat in selected_candidats:
+            score_by_candidate[candidat.name] = 0.
+    else:
+        score_by_candidate = {candidat.name : 0. for candidat in selected_candidats}
 
+    # Ask the questions
     for proposition in tqdm(proposition_keys, desc="Progression"):
         print("--------------------------------------------------------------------------------------------------")
         print(proposition)
@@ -146,6 +151,8 @@ def main(output_dir = './resultats'):
 
     # Print results
     print("\n---------------------------------- Résultats ----------------------------------\n")
+    prompt = ', '.join(selected_names)
+    print(f"Les candidats qui ont été notés sont : {prompt}.")
     print(f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :\n")
 
     # Average out each score
