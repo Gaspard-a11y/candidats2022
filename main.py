@@ -35,7 +35,7 @@ def split_selection_candidats(string, candidats):
         return valid_input, selected_nicknames
 
 
-def input_float(prompt): # TODO add min & max
+def input_float(prompt, lb = -5, ub = 5):
     """
     Input a float number in str format.
     Empty float results in 0.
@@ -44,7 +44,7 @@ def input_float(prompt): # TODO add min & max
     if len(string)==0:
         return 0.
     else:
-        return float(string)
+        return max(min(float(string), ub), lb)
 
 
 def save_object_into_json(item, output_path):
@@ -141,7 +141,7 @@ def main(output_dir = './resultats'):
         print("\n")
         candidate_name = propositions_dico[proposition]
         accord = input_float(
-            "Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ")
+            "Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ", lb = -5, ub = 5)
         score = float(accord)/5
         score_by_candidate[candidate_name] += score
         print("\n")
