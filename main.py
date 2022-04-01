@@ -123,14 +123,11 @@ def main(output_dir = './resultats'):
 
     print("\n")
     print("---------------------------------------- C'est terminé !  ----------------------------------------\n")
-    input("Appuyez sur Entrée pour voir vos résultats")
+    input("Appuyez sur Entrée pour voir vos résultats.")
 
     # Print results
-    print("\n")
-    print("---------------------------------- Résultats ----------------------------------")
-    print(
-        f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :")
-    print("\n")
+    print("\n---------------------------------- Résultats ----------------------------------\n")
+    print(f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :\n")
 
     # Average out each score
     for candidat in selected_candidats:
@@ -144,11 +141,13 @@ def main(output_dir = './resultats'):
         print(f"{candidate_name} : {round(score,2)}")
     print("\n")
 
+    # Save the results in a json file
     output_path = output_dir + '/' + name + '.json'
-    json_object = json.dumps(score_by_candidate, ensure_ascii=False, indent = 4).encode("utf8")
-    with open(output_path, "w") as outfile:
-        outfile.write(json_object) # FIXME
-    
+    with open(output_path, 'w', encoding='utf8') as json_file:
+        json.dump(score_by_candidate, json_file, ensure_ascii=False, indent=4)
+    print(f"Résultats sauvegardés à : {output_path}\n")
+
+
     # TODO allow saving the results in a e.g. txt file
     # TODO add matplotlib dependency and save a plot
 
