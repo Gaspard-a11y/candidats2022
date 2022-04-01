@@ -3,15 +3,18 @@ import json
 import random
 
 import fire
+import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from candidat import Candidat
 
 
-def load_candidats(programmes_dir = '.\candidats'):
+def load_candidats(programmes_dir='.\candidats'):
     programme_paths = [os.path.join(programmes_dir, programmes_files)
-            for programmes_files in os.listdir(programmes_dir)]
-    candidats = [Candidat(programme_path) for programme_path in programme_paths]
+                       for programmes_files in os.listdir(programmes_dir)]
+    candidats = [Candidat(programme_path)
+                 for programme_path in programme_paths]
     return candidats
 
 
@@ -23,10 +26,10 @@ def split_selection_candidats(string, candidats):
     Input candidats = list of Candidat objects.
     """
     candidats_nicknames = [candidat.nickname for candidat in candidats]
-    if len(string)==0:
+    if len(string) == 0:
         valid_input = True
         return valid_input, candidats_nicknames
-    else :
+    else:
         valid_input = True
         selected_nicknames = string.lower().split('-')
         # Check that all nicknames are registered
@@ -35,13 +38,13 @@ def split_selection_candidats(string, candidats):
         return valid_input, selected_nicknames
 
 
-def input_float(prompt, lb = -5, ub = 5):
+def input_float(prompt, lb=-5, ub=5):
     """
     Input a float number in str format.
     Empty float results in 0.
     """
     string = input(prompt)
-    if len(string)==0:
+    if len(string) == 0:
         return 0.
     else:
         return max(min(float(string), ub), lb)
@@ -53,7 +56,25 @@ def save_object_into_json(item, output_path):
     return
 
 
-def main(output_dir = './resultats'):
+def save_results_bar_plot(name, score_by_candidate, write_path):
+    labels = list(score_by_candidate.keys())
+    values = list(score_by_candidate.values())
+    x = np.arange(len(labels))
+    plt.figure(figsize=(14, 10))
+    plt.bar(x, values, width=0.5, label='Scores',
+            color='midnightblue', tick_label=labels)
+    plt.hlines(y=0, xmin=-1/2, xmax=len(x)-1/2,
+               colors='r', linestyles='dashed')
+    plt.xticks(rotation=20)
+    plt.grid()
+    plt.ylim(bottom=-1.1, top=1.1)
+    plt.xlim(left=-1/2, right=len(x)-1/2)
+    plt.title(
+        f"Score d'aligement politique de {name} avec les mesures principales de chaque candidat évalué.")
+    plt.savefig(write_path)
+
+
+def main(output_dir='./resultats'):
     """
     Main script, ask the selection of candidates, ask the questions and print results.
     """
@@ -73,13 +94,16 @@ def main(output_dir = './resultats'):
 
     # Check if there already are results
     output_path = output_dir + '/' + name + '.json'
+    output_path_png = output_dir + '/' + name + '.png'
+    
     if os.path.exists(output_path):
-        reuse_input = input("Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ").lower()
-        if reuse_input=='y' or reuse_input=='yes' or reuse_input=='o' or reuse_input=='oui':
+        reuse_input = input(
+            "Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ").lower()
+        if reuse_input == 'y' or reuse_input == 'yes' or reuse_input == 'o' or reuse_input == 'oui':
             reuse_input = True
-        elif reuse_input=='n' or reuse_input=='no' or reuse_input=='non':
+        elif reuse_input == 'n' or reuse_input == 'no' or reuse_input == 'non':
             reuse_input = False
-        else :
+        else:
             reuse_input = True
 
     # Candidates selection
@@ -94,19 +118,22 @@ def main(output_dir = './resultats'):
         print("Si vous notez à nouveau un candidat, son score précédent sera écrasé.")
     print("\n")
 
-    names_and_nicknames = [f"{candidat.name} : {candidat.nickname}" for candidat in candidats]
+    names_and_nicknames = [
+        f"{candidat.name} : {candidat.nickname}" for candidat in candidats]
     prompt = '\n'.join(names_and_nicknames)
     print(f"Diminutif des candidats :\n{prompt}\n")
 
     valid_input = False
     while not valid_input:
         selection_candidats = input("Choix des candidats : ")
-        valid_input, selected_candidats_nicknames = split_selection_candidats(selection_candidats, candidats)
+        valid_input, selected_candidats_nicknames = split_selection_candidats(
+            selection_candidats, candidats)
         if not valid_input:
             print("Sélection incorrecte, veuillez réessayer.")
 
     # Filter the candidats list based on selection
-    selected_candidats = [candidat for candidat in candidats if candidat.nickname in selected_candidats_nicknames]
+    selected_candidats = [
+        candidat for candidat in candidats if candidat.nickname in selected_candidats_nicknames]
 
     selected_names = [f"{candidat.name}" for candidat in selected_candidats]
     prompt = '\n'.join(selected_names)
@@ -127,12 +154,14 @@ def main(output_dir = './resultats'):
     # Initialize scores
     if reuse_input:
         # Read the previous json file
-        score_by_candidate = json.load(open(output_path, "rb"), encoding="utf-8")
+        score_by_candidate = json.load(
+            open(output_path, "rb"), encoding="utf-8")
         # Re-initialize the scores of the selected candidates
         for candidat in selected_candidats:
             score_by_candidate[candidat.name] = 0.
     else:
-        score_by_candidate = {candidat.name : 0. for candidat in selected_candidats}
+        score_by_candidate = {
+            candidat.name: 0. for candidat in selected_candidats}
 
     # Ask the questions
     for proposition in tqdm(proposition_keys, desc="Progression"):
@@ -141,7 +170,7 @@ def main(output_dir = './resultats'):
         print("\n")
         candidate_name = propositions_dico[proposition]
         accord = input_float(
-            "Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ", lb = -5, ub = 5)
+            "Accord avec la mesure (pas du tout d'accord : -5 , ... , 5 : complètement d'accord) : ", lb=-5, ub=5)
         score = float(accord)/5
         score_by_candidate[candidate_name] += score
         print("\n")
@@ -153,7 +182,8 @@ def main(output_dir = './resultats'):
     print("\n---------------------------------- Résultats ----------------------------------\n")
     prompt = ', '.join(selected_names)
     print(f"Les candidats qui ont été notés sont : {prompt}.")
-    print(f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :\n")
+    print(
+        f"Voici les scores de {name} par candidats (complètement en désaccord : -1 , ... , 1 : complètement en accord) :\n")
 
     # Average out each score
     for candidat in selected_candidats:
@@ -161,7 +191,7 @@ def main(output_dir = './resultats'):
 
     # Print the results in descending order
     sorted_scores = list(score_by_candidate.items())
-    sorted_scores.sort(reverse=True, key = lambda x: x[1])
+    sorted_scores.sort(reverse=True, key=lambda x: x[1])
     for name_score in sorted_scores:
         candidate_name, score = name_score
         print(f"{candidate_name} : {round(score,2)}")
@@ -169,9 +199,9 @@ def main(output_dir = './resultats'):
 
     # Save the results in a json file
     save_object_into_json(score_by_candidate, output_path)
-    print(f"Résultats sauvegardés à : {output_path}\n")
+    print(f"Résultats sauvegardés à : {output_path_png}\n")
 
-    # TODO add matplotlib dependency and save a plot
+    save_results_bar_plot(name, score_by_candidate, output_path_png)
 
     return
 
