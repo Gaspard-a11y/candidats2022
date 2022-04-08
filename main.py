@@ -53,6 +53,14 @@ def input_float(prompt, lb=-5, ub=5):
     else:
         return max(min(float(string), ub), lb)
 
+def input_boolean(script):
+    yes_or_no = input(script).lower()
+    if yes_or_no == 'y' or yes_or_no == 'yes' or yes_or_no == 'o' or yes_or_no == 'oui':
+        yes_or_no = True
+    elif yes_or_no == 'n' or yes_or_no == 'no' or yes_or_no == 'non':
+        yes_or_no = False
+    else:
+        yes_or_no = True
 
 def save_object_into_json(item, output_path):
     with open(output_path, 'w', encoding='utf8') as json_file:
@@ -60,7 +68,7 @@ def save_object_into_json(item, output_path):
     return
 
 
-def save_results_bar_plot(name, score_by_candidate, write_path):
+def save_results_bar_plot(name, score_by_candidate, write_path, show_graph):
     labels = list(score_by_candidate.keys())
     values = list(score_by_candidate.values())
     x = np.arange(len(labels))
@@ -76,6 +84,8 @@ def save_results_bar_plot(name, score_by_candidate, write_path):
     plt.title(
         f"Score d'aligement politique de {name} avec les mesures principales de chaque candidat évalué.")
     plt.savefig(write_path)
+    if show_graph:
+        plt.show()
 
 
 def main(programmes_dir=Path('candidats/'), output_dir=Path('resultats/')):
@@ -102,14 +112,7 @@ def main(programmes_dir=Path('candidats/'), output_dir=Path('resultats/')):
     output_path_png = output_dir / (name+'.png')
 
     if output_path.exists():
-        reuse_input = input(
-            "Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ").lower()
-        if reuse_input == 'y' or reuse_input == 'yes' or reuse_input == 'o' or reuse_input == 'oui':
-            reuse_input = True
-        elif reuse_input == 'n' or reuse_input == 'no' or reuse_input == 'non':
-            reuse_input = False
-        else:
-            reuse_input = True
+        reuse_input = input_boolean("Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ")
     else:
         reuse_input = False
 
@@ -207,8 +210,9 @@ def main(programmes_dir=Path('candidats/'), output_dir=Path('resultats/')):
     # Save the results in a json file
     save_object_into_json(score_by_candidate, output_path)
     print(f"Résultats sauvegardés à : {output_path_png}\n")
+    show_graph = input_boolean("Montrer les résultats ? [Y/N]")
+    save_results_bar_plot(name, score_by_candidate, output_path_png, show_graph)
 
-    save_results_bar_plot(name, score_by_candidate, output_path_png)
 
     return
 
