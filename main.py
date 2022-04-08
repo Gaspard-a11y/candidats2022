@@ -74,13 +74,13 @@ def save_results_bar_plot(name, score_by_candidate, write_path):
     plt.savefig(write_path)
 
 
-def main(output_dir='./resultats'):
+def main(programmes_dir='.\candidats', output_dir='./resultats'):
     """
     Main script, ask the selection of candidates, ask the questions and print results.
     """
 
     # Load candidates' profiles
-    candidats = load_candidats()
+    candidats = load_candidats(programmes_dir)
 
     # Intro
     print("---------------------------------------- Candidats 2022  ----------------------------------------\n")
