@@ -82,7 +82,7 @@ def save_results_bar_plot(name, score_by_candidate, write_path, show_graph):
     plt.ylim(bottom=-1.1, top=1.1)
     plt.xlim(left=-1/2, right=len(x)-1/2)
     plt.title(
-        f"Score d'aligement politique de {name} avec les mesures principales de chaque candidat évalué.")
+        f"Score d'aligement politique de {name} avec les mesures principales de chaque candidat évalué. 1 = accord parfait, -1 = désaccord parfait")
     plt.savefig(write_path)
     if show_graph:
         plt.show()
