@@ -1,6 +1,7 @@
 import os
 import json
 import random
+from pathlib import Path
 
 import fire
 import numpy as np
@@ -10,9 +11,12 @@ import matplotlib.pyplot as plt
 from candidat import Candidat
 
 
-def load_candidats(programmes_dir='.\candidats'):
-    programme_paths = [os.path.join(programmes_dir, programmes_files)
-                       for programmes_files in os.listdir(programmes_dir)]
+def load_candidats(programmes_dir_path=Path('candidats/')):
+    programmes_dir_path = Path(programmes_dir_path)
+    # programme_paths = [os.path.join(programmes_dir_path, programmes_files)
+    #                    for programmes_files in os.listdir(programmes_dir_path)]
+    programme_paths = [programmes_dir_path / programmes_files
+                       for programmes_files in os.listdir(programmes_dir_path)]
     candidats = [Candidat(programme_path)
                  for programme_path in programme_paths]
     return candidats
@@ -74,10 +78,12 @@ def save_results_bar_plot(name, score_by_candidate, write_path):
     plt.savefig(write_path)
 
 
-def main(programmes_dir='.\candidats', output_dir='./resultats'):
+def main(programmes_dir=Path('candidats/'), output_dir=Path('resultats/')):
     """
     Main script, ask the selection of candidates, ask the questions and print results.
     """
+    programmes_dir=Path(programmes_dir)
+    output_dir=Path(output_dir)
 
     # Load candidates' profiles
     candidats = load_candidats(programmes_dir)
@@ -92,10 +98,10 @@ def main(programmes_dir='.\candidats', output_dir='./resultats'):
     name = input("Votre prénom : ")
 
     # Check if there already are results
-    output_path = output_dir + '/' + name + '.json'
-    output_path_png = output_dir + '/' + name + '.png'
+    output_path = output_dir / (name+'.json')
+    output_path_png = output_dir / (name+'.png')
 
-    if os.path.exists(output_path):
+    if output_path.exists():
         reuse_input = input(
             "Des résultats à ce nom ont été trouvés, les compléter ? (Si 'N', les résultats précédents seront écrasés) [Y/N] : ").lower()
         if reuse_input == 'y' or reuse_input == 'yes' or reuse_input == 'o' or reuse_input == 'oui':
